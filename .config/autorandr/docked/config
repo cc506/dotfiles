@@ -1,0 +1,14 @@
+output HDMI-1
+off
+output DP-2
+off
+output HDMI-2
+off
+output eDP-1
+off
+output DP-1
+mode 1920x1080
+panning 3200x1800+0+0
+pos 0x0
+rate 60.00
+transform 1.669998,0.000000,0.000000,0.000000,1.669998,0.000000,0.000000,0.000000,1.000000
