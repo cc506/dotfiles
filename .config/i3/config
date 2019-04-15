@@ -238,7 +238,7 @@ bindsym XF86AudioPrev exec playerctl previous
 
 # Wallpaper & Theme
 exec_always feh --bg-scale /home/charleschung/Pictures/D7aQ98l.jpg
-exec_always wal -R
+exec_always --no-startup-id wal -R
 
 # xrandr
 exec xrandr --output DP-1 --scale 1.67x1.67 --panning 3200x1800
