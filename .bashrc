@@ -116,6 +116,10 @@ if ! shopt -oq posix; then
   fi
 fi
 
+#==================================================#
+#         .bashrc with Powerline & Wal!            #
+#==================================================#
+
 #ROS Requirements
 source /opt/ros/kinetic/setup.bash
 source ~/CSE180/devel/setup.bash
@@ -129,3 +133,27 @@ neofetch
 # Install Ruby Gems to ~/gems
 export GEM_HOME="$HOME/gems"
 export PATH="$HOME/gems/bin:$PATH"
+
+# Java config
+JAVA_HOME=/usr/lib/jvm/default-java/bin
+export JAVA_HOME
+PATH=$PATH:$JAVA_HOME
+export PATH
+
+# Powerline
+function _update_ps1() {
+    PS1=$(powerline-shell $?)
+}
+
+if [[ $TERM != linux && ! $PROMPT_COMMAND =~ _update_ps1 ]]; then
+    PROMPT_COMMAND="_update_ps1; $PROMPT_COMMAND"
+fi
+
+# wal
+wal -R -t
+
+# Android Studio Config
+export ANDROID_HOME=/home/user_directory/Android/Sdk
+export PATH=${PATH}:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
+export JAVA_HOME=/usr/lib/jvm/java-8-oracle
+alias android-studio=~/Downloads/android-studio/bin/studio.sh
