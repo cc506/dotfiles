@@ -1,48 +1,77 @@
-#!/bin/bash 
+#!/bin/bash
 
-METRIC=1 #Should be 0 or 1; 0 for F, 1 for C
- 
-if [ -z $1 ]; then
-echo
-echo "USAGE: weather.sh <locationcode>"
-echo
-exit 0;
+####################################################
+# CREATION     : 2016-07-04
+# MODIFICATION : 2016-10-26
+
+# I3block's blocklet which:
+# - Show current temperature
+# - Show temperature for the next 3 days with a left click
+# - Update temperature with a middle click
+
+# Requirements:
+# - curl
+# - yad (For mouse interaction)
+#
+####################################################
+
+city="${BLOCK_INSTANCE:-""}"
+
+if [ -z "$city" ]; then exit; fi
+
+declare -A state_icons=( \
+	["Cloudy"]="" \
+	["Fog"]="" \
+	["Heavy_Rain"]="" \
+	["Heavy_Showers"]="" \
+	["Heavy_Snow"]="" \
+	["Heavy_Snow_Showers"]="/" \
+	["Light_Rain"]="" \
+	["Light_Showers"]="" \
+	["Light_Sleet"]="" \
+	["Light_Sleet_Showers"]="" \
+	["Light_Snow"]="" \
+	["Light_Snow_Showers"]="" \
+	["Partly_Cloudy"]="/" \
+	["Sunny"]="" \
+	["Thundery_Heavy_Rain"]="/" \
+	["Thundery_Showers"]=""  \
+	["Thundery_Snow_Showers"]="/" \
+	["Very_Cloudy"]="" \
+	["generic"]="" \
+)
+
+getCurrWeather() {
+	local datas=$(curl --silent "wttr.in/${city}" | sed "s,\x1B\[[0-9;]*[a-zA-Z],,g")
+	local head=$(echo "$datas" | head -n 7)
+	local state=$(echo "$head" | head -n 3 | tail -n 1 | awk '{print $NF}')
+
+	# for Celsius
+	# local temperature=$(echo "$head" | grep -o "[0-9]*\ *°F")
+
+	# for Freedom Units
+	local temperature=$(echo "$head" | grep -o "[0-9]*\ *°F")
+
+	echo "${state} ${temperature}"
+}
+
+yad="yad --text-info --no-buttons --on-top --center --skip-taskbar --width 1080 --height 720"
+case $BLOCK_BUTTON in
+    1) curl --silent "wttr.in/${city}" | sed "s,\x1B\[[0-9;]*[a-zA-Z],,g" | $yad;;     # left click
+    2) pkill -RTMIN+2 i3blocks;;    # middle click
+esac
+
+w=$(getCurrWeather)
+
+state=$(echo "$w" | cut -d " " -f 1 | tr " " "_")
+temp=$(echo "$w" | awk '{print $2 $3}')
+
+if [[ "${!state_icons[*]}" =~ $state ]]; then
+	icon=${state_icons[$state]}
+else
+	icon=${state_icons["generic"]}
 fi
- 
-curl -s http://rss.accuweather.com/rss/liveweather_rss.asp\?metric\=${METRIC}\&locCode\=$1 | perl -ne 'use utf8; if (/Currently/) {chomp;/\<title\>Currently: (.*)?\<\/title\>/; my @values=split(":",$1); if( $values[0] eq "Sunny" || $values[0] eq "Mostly Sunny" || $values[0] eq "Partly Sunny" || $values[0] eq "Intermittent Clouds" || $values[0] eq "Hazy Sunshine" || $values[0] eq "Hazy Sunshine" || $values[0] eq "Hot") 
-{
-my $sun = "";
-binmode(STDOUT, ":utf8");
-print "$sun";
-}
-if( $values[0] eq "Mostly Cloudy" || $values[0] eq "Cloudy" || $values[0] eq "Dreary (Overcast)" || $values[0] eq "Fog")
-{
-my $cloud = "";
-binmode(STDOUT, ":utf8");
-print "$cloud";
-}
-if( $values[0] eq "Showers" || $values[0] eq "Mostly Cloudy w/ Showers" || $values[0] eq "Partly Sunny w/ Showers" || $values[0] eq "T-Storms"|| $values[0] eq "Mostly Cloudy w/ T-Storms"|| $values[0] eq "Partly Sunny w/ T-Storms"|| $values[0] eq "Rain")
-{
-my $rain = "";
-binmode(STDOUT, ":utf8");
-print "$rain";
-}
-if( $values[0] eq "Windy")
-{
-my $wind = "";
-binmode(STDOUT, ":utf8");
-print "$wind";
-} 
-if($values[0] eq "Flurries" || $values[0] eq "Mostly Cloudy w/ Flurries" || $values[0] eq "Partly Sunny w/ Flurries"|| $values[0] eq "Snow"|| $values[0] eq "Mostly Cloudy w/ Snow"|| $values[0] eq "Ice"|| $values[0] eq "Sleet"|| $values[0] eq "Freezing Rain"|| $values[0] eq "Rain and Snow"|| $values[0] eq "Cold")
-{
-my $snow = "";
-binmode(STDOUT, ":utf8");
-print "$rain";
-}
-if($values[0] eq "Clear" || $values[0] eq "Mostly Clear" || $values[0] eq "Partly Cloudy"|| $values[0] eq "Intermittent Clouds"|| $values[0] eq "Hazy Moonlight"|| $values[0] eq "Mostly Cloudy"|| $values[0] eq "Partly Cloudy w/ Showers"|| $values[0] eq "Mostly Cloudy w/ Showers"|| $values[0] eq "Partly Cloudy w/ T-Storms"|| $values[0] eq "Mostly Cloudy w/ Flurries" || $values[0] eq "Mostly Cloudy w/ Snow")
-{
-my $night = "";
-binmode(STDOUT, ":utf8");
-print "$night";
-}
-print"$values[1]"; }'
+
+echo "$icon  $temp"
+echo "$icon  $temp"
+echo
