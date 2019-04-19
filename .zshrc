@@ -16,7 +16,7 @@ POWERLEVEL9K_PROMPT_ON_NEWLINE=true
 POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX="▶ "
 POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX=""
 
-POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(custom_fedora_icon context dir vcs)
+#POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(custom_fedora_icon context dir vcs)
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
