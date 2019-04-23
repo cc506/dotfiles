@@ -125,7 +125,7 @@ PATH=$PATH:$JAVA_HOME
 export PATH
 
 # wal
-wal -R -t
+wal -R
 
 # Android Studio Config
 export ANDROID_HOME=/home/user_directory/Android/Sdk
